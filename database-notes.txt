@@ -1,0 +1,21 @@
+General:
+
+Don't forget to prevent your backup systems from trying to backup raw
+database files, unless perhaps if the backup systems use the
+filesystem stack to create snapshots, in which case you can hope the
+database recovery mechanism will do the right thing if it's being
+modified while being backed up.
+
+
+SQLite3:
+
+https://sqlite.org/index.html
+
+Should already be installed on your system, zero-admin to the point of
+having an in memory database using ":memory:".
+
+
+PostgreSQL:
+
+https://www.postgresql.org/
+
