@@ -6,11 +6,23 @@ filesystem stack to create snapshots, in which case you can hope the
 database recovery mechanism will do the right thing if it's being
 modified while being backed up.
 
+
 It is STRONGLY recommended that when you use the command line to
 interact with databases or most anything else in development, that you
 do it in an environment that captures a transcript.  But beware of
 capturing sensitive passwords in transcripts.
 
+
+Tests will in general depend on the environment variable
+SDBI_[ database name ]_PASSWORD being defined.  For example, for
+PostgreSQL when using bash:
+
+export SDBI_POSTGRESQL_PASSWORD="[ DO-NOT-CAPTURE-THIS! ]"
+
+Replace [ DO-NOT-CAPTURE-THIS! ] with your password.
+
+
+--------
 
 SQLite3:
 
@@ -19,6 +31,8 @@ https://sqlite.org/index.html
 Should already be installed on your system, zero-admin to the point of
 having an in memory database using ":memory:".
 
+
+--------
 
 PostgreSQL:
 
@@ -74,10 +88,3 @@ psql --no-readline testdb
 \pset pager
 SELECT version();
 \d [ Should reply "Did not find any relations." ]
-
-Tests will in general depend on environment variables like
-SDBI_[ database name ]_PASSWORD being defined, for PostgreSQL when
-using bash:
-
-export SDBI_POSTGRESQL_PASSWORD="'[ DO-NOT-CAPTURE-THIS! ]'
-
