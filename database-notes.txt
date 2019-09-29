@@ -57,19 +57,13 @@ postgresql-11  	          core database server
 Which should also install postgresql-client-11, "client libraries and
 client binaries", needed for command line configuration of databases.
 
-Suggested on the Ubuntu page are also:
-
-postgresql-contrib-9.x    additional supplied modules (part of the postgresql-xx package in version 10 and later)
-libpq-dev                 libraries and headers for C language frontend development
-postgresql-server-dev-11  libraries and headers for C language backend development
-
 The default Linux installation location for data files should be /var/lib/postgresql/
 
 Note partitioning using stock PostgreSQL is very immature:
 https://www.postgresql.org/docs/release/11.5/
 
 
-To configure the PostgreSQL 11(.5) test database for use buy testuser
+To configure the PostgreSQL 11(.5) test database for use by testuser
 on Ubuntu 18.04 Bionic Beaver, this was done in a Gnu Emacs shell
 buffer, hence the --no-readline and \pset pager initial settings.
 
