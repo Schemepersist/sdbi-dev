@@ -82,3 +82,64 @@ psql --no-readline testdb
 \pset pager
 SELECT version();
 \d [ Should reply "Did not find any relations." ]
+
+
+Cassandra:
+
+C/C++ driver: https://github.com/datastax/cpp-driver, click on top
+link https://docs.datastax.com/en/developer/cpp-driver/latest and you
+should get redirected to latest set of drivers.  For Bionic Beaver:
+
+cassandra-cpp-driver_2.13.0-1_amd64.deb
+cassandra-cpp-driver-dev_2.13.0-1_amd64.deb
+cassandra-cpp-driver-dbg_2.13.0-1_amd64.deb
+
+Manually install .deb files like "sudo dpkg -i  cassandra-cpp-driver*"
+
+For that current version, documentation at:
+
+https://docs.datastax.com/en/developer/cpp-driver/2.13/api/
+https://docs.datastax.com/en/developer/cpp-driver/2.13/topics/
+
+
+Database:
+
+See this for how to install and check status afterwords:
+http://cassandra.apache.org/doc/latest/getting_started/installing.html
+
+For the JVM, I trust Azul Systems' free TCK checked Zulu distribution,
+see https://www.azul.com/downloads/zulu-community/ They're also said
+to cost a *lot* less than Oracle for better? tech support.  Amazon
+also has a TCK checked distribution which I have no other knowledge
+about, https://aws.amazon.com/corretto/.  Beware of any OpenJDK
+distribution which is built by an entity that doesn't have a TCK
+license to test it.  And of course bewere of Oracle licence games.
+
+Note that on Bionic Beaver, stock Ubuntu ntp ntpd deamon does not
+work; multiple systems Cassandra installations depend on accurate
+time, should not matter for a single system for development.  Install
+all the files like this:
+
+sudo apt-get install cassandra libopts25 ntp sntp cassandra-tools ntp-doc
+
+Then uninstall ntp:
+
+sudo apt-get remove ntp
+
+At the bottom of the above link, it says to use "nodetool status" to
+verify that Cassandra is running, I got:
+
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address    Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  127.0.0.1  210.72 KiB  256          100.0%            3f3cXXXXXXXXXXXXXXXXXXXXXXXXXXXX6786  rack1
+
+And:
+
+The default location of configuration files is /etc/cassandra.
+The default location of log and data directories is /var/log/cassandra/ and /var/lib/cassandra.
+
+On installation those should only take up a few megabytes.
+
