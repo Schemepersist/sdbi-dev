@@ -143,3 +143,18 @@ The default location of log and data directories is /var/log/cassandra/ and /var
 
 On installation those should only take up a few megabytes.
 
+Follow the "Next ->" buttons on the bottom of the pages for more.
+
+To test the setup from the command line like psql:
+
+cqlsh localhost
+SELECT cluster_name, listen_address FROM system.local;
+
+Which should return something like:
+
+ cluster_name | listen_address
+--------------+----------------
+ Test Cluster |      127.0.0.1
+
+(1 rows)
+
