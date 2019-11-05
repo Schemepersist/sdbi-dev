@@ -22,7 +22,7 @@ export SDBI_POSTGRESQL_PASSWORD="[ DO-NOT-CAPTURE-THIS! ]"
 Replace [ DO-NOT-CAPTURE-THIS! ] with your password.
 
 
---------
+----------------
 
 SQLite3:
 
@@ -32,7 +32,7 @@ Should already be installed on your system, zero-admin to the point of
 having an in memory database using ":memory:".
 
 
---------
+----------------
 
 PostgreSQL:
 
@@ -83,6 +83,133 @@ psql --no-readline testdb
 SELECT version();
 \d [ Should reply "Did not find any relations." ]
 
+
+----------------
+
+https://news.ycombinator.com/item?id=21450711
+
+In MySQL, never use “utf8”. Use “utf8mb4”  https://medium.com/@adamhooper/in-mysql-never-use-utf8-use-utf8mb4-11761243e434
+
+----
+
+mikl 1 hour ago [-] [-]
+
+MySQL is a great example how extreme commitment to backwards compatibility makes your whole product backwards.
+It is chock full of bugs and footguns that you can work around and mitigate if you know how to configure it correctly, but most of those improvements are still not the default.
+
+And the `utf8` encoding, that does not fully support UTF-8 looks like it’ll stay around forever. ಠ_ಠ
+
+As the author of the post says, much better to just use PostgreSQL, will save you a lot of headaches down the road.
+
+----
+
+donalhunt 2 hours ago [-] [-]
+
+previous discussion: https://news.ycombinator.com/item?id=17310690
+additional context (which the OP didn't reference):
+
+https://mysqlserverteam.com/mysql-8-0-when-to-use-utf8mb3-over-utf8mb4/
+
+https://mysqlserverteam.com/sushi-beer-an-introduction-of-utf8-support-in-mysql-8-0/
+
+https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8mb3.html
+
+hint: "Exactly the same set of characters is available in utf8mb3 and ucs2."
+
+--------
+
+In MySQL, never use “utf8”. Use “utf8mb4”.
+Adam Hooper
+Adam Hooper
+Follow
+May 13, 2016 · 5 min read
+Today’s bug: I tried to store a UTF-8 string in a MariaDB “utf8”-encoded database, and Rails raised a bizarre error:
+
+Incorrect string value: ‘\xF0\x9F\x98\x83 <…’ for column ‘summary’ at row 1
+This is a UTF-8 client and a UTF-8 server, in a UTF-8 database with a UTF-8 collation. The string, “😃 <…”, is valid UTF-8.
+
+But here’s the rub: MySQL’s “utf8” isn’t UTF-8.
+
+The “utf8” encoding only supports three bytes per character. The real UTF-8 encoding — which everybody uses, including you — needs up to four bytes per character.
+
+MySQL developers never fixed this bug. They released a workaround in 2010: a new character set called “utf8mb4”.
+
+Of course, they never advertised this (probably because the bug is so embarrassing). Now, guides across the Web suggest that users use “utf8”. All those guides are wrong.
+
+In short:
+
+MySQL’s “utf8mb4” means “UTF-8”.
+MySQL’s “utf8” means “a proprietary character encoding”. This encoding can’t encode many Unicode characters.
+I’ll make a sweeping statement here: all MySQL and MariaDB users who are currently using “utf8” should actually use “utf8mb4”. Nobody should ever use “utf8”.
+
+What’s encoding? What’s UTF-8?
+
+Joel on Software wrote my favorite introduction. I’ll abridge it.
+
+Computers store text as ones and zeroes. The first letter in this paragraph was stored as “01000011” and your computer drew “C”. Your computer chose “C” in two steps:
+
+Your computer read “01000011” and determined that it’s the number 67. That’s because 67 was encoded as “01000011”.
+Your computer looked up character number 67 in the Unicode character set, and it found that 67 means “C”.
+The same thing happened on my end when I typed that “C”:
+
+My computer mapped “C” to 67 in the Unicode character set.
+My computer encoded 67, sending “01000011” to this web server.
+Character sets are a solved problem. Almost every program on the Internet uses the Unicode character set, because there’s no incentive to use another.
+
+But encoding is more of a judgement call. Unicode has slots for over a million characters. (“C” and “💩” are two such characters.) The simplest encoding, UTF-32, makes each character take 32 bits. That’s simple, because computers have been treating groups of 32 bits as numbers for ages, and they’re really good at it. But it’s not useful: it’s a waste of space.
+
+UTF-8 saves space. In UTF-8, common characters like “C” take 8 bits, while rare characters like “💩” take 32 bits. Other characters take 16 or 24 bits. A blog post like this one takes about four times less space in UTF-8 than it would in UTF-32. So it loads four times faster.
+
+You may not realize it, but our computers agreed on UTF-8 behind the scenes. If they didn’t, then when I type “💩” you’ll see a mess of random data.
+
+MySQL’s “utf8” character set doesn’t agree with other programs. When they say “💩”, it balks.
+
+A bit of MySQL history
+
+Why did MySQL developers make “utf8” invalid? We can guess by looking at commit logs.
+
+MySQL supported UTF-8 since version 4.1. That was 2003 — before today’s UTF-8 standard, RFC 3629.
+
+The previous UTF-8 standard, RFC 2279, supported up to six bytes per character. MySQL developers coded RFC 2279 in the the first pre-pre-release version of MySQL 4.1 on March 28, 2002.
+
+Then came a cryptic, one-byte tweak to MySQL’s source code in September: “UTF8 now works with up to 3 byte sequences only.”
+
+Who asked for this change? Why? I can’t tell. There’s nothing on the mailing list around September 2003 that explains the change. (RFC 2279 was declared obsolete in November 2003 to make way for the current UTF-8 standard, RFC 3629.)
+
+But I can guess why MySQL violated the standard.
+
+Back in 2002, MySQL gave users a speed boost if users could guarantee that every row in a table had the same number of bytes. To do that, users would declare text columns as “CHAR”. Every record’s value in a “CHAR” column has the same number of characters. If you feed it too few characters, MySQL adds spaces to the end; if you feed it too many characters, MySQL truncates the last ones.
+
+When MySQL developers first tried UTF-8, with its back-in-the-day six bytes per character, they likely balked: a CHAR(1) column would take six bytes; a CHAR(2) column would take 12 bytes; and so on.
+
+Let’s be clear: that initial behavior, which was never released, was correct. It was well documented and widely adopted, and anybody who understood UTF-8 would agree that it was right.
+
+But clearly, a MySQL developer (or user, or businessperson) was concerned that a user or two would do two things:
+
+Choose CHAR columns. (The CHAR format is a relic nowadays. Back then, MySQL was faster with CHAR columns. Ever since 2005, it’s not.)
+Choose to encode those CHAR columns as “utf8”.
+My guess is that MySQL developers broke their “utf8” encoding to help these users: users who both 1) tried to optimize for space and speed; and 2) neglected to optimize for speed and space.
+
+Nobody won. Users who wanted speed and space were still wrong to use “utf8” CHAR columns, because those columns were still bigger and slower than they had to be. And developers who wanted correctness were wrong to use “utf8”, because it can’t store “💩”.
+
+Once MySQL published this invalid character set, it could never fix it: that would force every user to rebuild every database. MySQL finally released UTF-8 support in 2010, with a different name: “utf8mb4”.
+
+Why it’s so frustrating
+
+Clearly I was frustrated this week. My bug was hard to find because I was fooled by the name “utf8”. And I’m not the only one — almost every article I found online touted “utf8” as, well, UTF-8.
+
+The name “utf8” was always an error. It’s a proprietary character set. It created new problems, and it didn’t solve the problem it meant to solve.
+
+It’s false advertising.
+
+My take-away lessons
+
+Database systems have subtle bugs and oddities, and you can avoid a lot of bugs by avoiding database systems.
+If you need a database, don’t use MySQL or MariaDB. Use PostgreSQL.
+If you need to use MySQL or MariaDB, never use “utf8”. Always use “utf8mb4” when you want UTF-8. Convert your database now to avoid headaches later.
+
+
+----------------
 
 Cassandra:
 
