@@ -24,6 +24,55 @@ Replace [ DO-NOT-CAPTURE-THIS! ] with your password.
 
 ----------------
 
+Getting schema information:
+
+https://news.ycombinator.com/item?id=21510542
+
+paulddraper 1 day ago [-] [-] [collapse whole thread]
+
+> since "show the tables" isn't in SQL itself,
+Actually
+
+    SELECT table_name FROM information_schedule.tables;
+But yes, that's harder to type/remember than \d.
+
+--
+
+lwb 1 day ago [-] [-] [collapse whole thread]
+
+Does that really work for every version of SQL? This might change my life.
+
+--
+
+carlineng 1 day ago [-] [-] [collapse whole thread]
+
+information_schema (not "schedule"; GP had a typo in the query) is part of the ANSI SQL standard[1] so should work with any database that implements the ANSI standard. Note that not all databases or SQL dialects comply with this.
+[1] https://en.wikipedia.org/wiki/Information_schema
+
+--
+
+emmelaich 1 day ago [-] [-] [collapse whole thread]
+
+Also, you can see a more or less complete "contents" listing of the recent draft standard here:
+https://webstore.iec.ch/preview/info_isoiec9075-11%7Bed4.0%7Den.pdf
+
+Not the actual standard though, that'll cost you a few hundred bucks.
+
+[edit - you can see the 1992 complete version here; do a search for information_schema.
+
+http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
+
+courtesy of Ian Winand - https://modern-sql.com/standard]
+
+--
+
+emmelaich 1 day ago [-] [-] [collapse whole thread]
+
+Found a free 2011 draft - click the 2011 draft standard link at the bottom of https://www.wikiwand.com/en/SQL#/Sources
+to get a zip file of pdfs. The schema is in 7IWD2-11-Schemata-2011-12.pdf
+
+----------------
+
 SQLite3:
 
 https://sqlite.org/index.html
